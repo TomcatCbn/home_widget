@@ -41,15 +41,16 @@ bool init = false;
 @pragma("vm:entry-point")
 void backgroundCallback(Uri? data) async {
   print('cbn=$data');
-  Dio().get('https://baidu.com')..then((value) => print('cbn=${value.data.toString()}'));
   if (!init) {
     init = true;
     // WidgetsFlutterBinding.ensureInitialized();
     // await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
     // await Workmanager().registerPeriodicTask('1', 'widgetBackgroundUpdate',
     //     frequency: Duration(minutes: 1));
-    Timer.periodic(Duration(seconds: 15), (timer) async {
+    Timer.periodic(Duration(seconds: 5), (timer) async {
       final now = DateTime.now();
+      var value = await Dio().get('https://baidu.com');
+      print('cbn=${value.data.toString()}');
       return Future.wait<bool?>([
         HomeWidget.saveWidgetData(
           'title',
