@@ -3,6 +3,7 @@ package es.antonborri.home_widget
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
+import android.os.IBinder
 import android.util.Log
 import androidx.core.app.JobIntentService
 import io.flutter.FlutterInjector
@@ -32,8 +33,13 @@ class HomeWidgetBackgroundService : MethodChannel.MethodCallHandler, JobIntentSe
         }
     }
 
+    override fun onBind(intent: Intent): IBinder? {
+        return super.onBind(intent)
+    }
+
     override fun onCreate() {
         super.onCreate()
+        Log.e("cbn", "service onCreate")
         synchronized(serviceStarted) {
             context = this
             if (engine == null) {
@@ -41,6 +47,7 @@ class HomeWidgetBackgroundService : MethodChannel.MethodCallHandler, JobIntentSe
 
                 if (callbackHandle == 0L) {
                     Log.e(TAG, "No callbackHandle saved. Did you call HomeWidget.registerBackgroundCallback?")
+                    Log.e("cbn", "No callbackHandle saved. Did you call HomeWidget.registerBackgroundCallback?")
                 }
 
                 engine = FlutterEngine(context)
@@ -62,7 +69,13 @@ class HomeWidgetBackgroundService : MethodChannel.MethodCallHandler, JobIntentSe
         channel.setMethodCallHandler(this)
     }
 
+    override fun onDestroy() {
+        Log.e("cbn", "onDestroy...")
+        super.onDestroy()
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        Log.e("cbn", "onMethodCall, ${call.method}")
         if (call.method == "HomeWidget.backgroundInitialized") {
             synchronized(serviceStarted) {
                 while (!queue.isEmpty()) {

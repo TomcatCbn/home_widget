@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,9 @@ import 'package:workmanager/workmanager.dart';
 /// Used for Background Updates using Workmanager Plugin
 @pragma("vm:entry-point")
 void callbackDispatcher() {
+  print('callbackDispatcher called...');
   Workmanager().executeTask((taskName, inputData) {
+    print('executeTask called...');
     final now = DateTime.now();
     return Future.wait<bool?>([
       HomeWidget.saveWidgetData(
@@ -20,7 +23,7 @@ void callbackDispatcher() {
       ),
       HomeWidget.saveWidgetData(
         'message',
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}',
       ),
       HomeWidget.updateWidget(
         name: 'HomeWidgetExampleProvider',
@@ -32,10 +35,39 @@ void callbackDispatcher() {
   });
 }
 
+bool init = false;
+
 /// Called when Doing Background Work initiated from Widget
 @pragma("vm:entry-point")
 void backgroundCallback(Uri? data) async {
-  print(data);
+  print('cbn=$data');
+  Dio().get('https://baidu.com')..then((value) => print('cbn=${value.data.toString()}'));
+  if (!init) {
+    init = true;
+    // WidgetsFlutterBinding.ensureInitialized();
+    // await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+    // await Workmanager().registerPeriodicTask('1', 'widgetBackgroundUpdate',
+    //     frequency: Duration(minutes: 1));
+    Timer.periodic(Duration(seconds: 15), (timer) async {
+      final now = DateTime.now();
+      return Future.wait<bool?>([
+        HomeWidget.saveWidgetData(
+          'title',
+          'Updated from Background',
+        ),
+        HomeWidget.saveWidgetData(
+          'message',
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}',
+        ),
+        HomeWidget.updateWidget(
+          name: 'HomeWidgetExampleProvider',
+          iOSName: 'HomeWidgetExample',
+        ),
+      ]).then((value) {
+        return !value.contains(false);
+      });
+    });
+  }
 
   if (data?.host == 'titleclicked') {
     final greetings = [
@@ -156,7 +188,7 @@ class _MyAppState extends State<MyApp> {
 
   void _startBackgroundUpdate() {
     Workmanager().registerPeriodicTask('1', 'widgetBackgroundUpdate',
-        frequency: Duration(minutes: 15));
+        frequency: Duration(minutes: 1));
   }
 
   void _stopBackgroundUpdate() {

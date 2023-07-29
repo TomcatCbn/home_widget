@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 /// Dispatcher used for calling dart code from Native Code while in the background
 @pragma("vm:entry-point")
 void callbackDispatcher() {
+  print('cbn callbackDispatcher from home_widget plugin');
   const backgroundChannel = MethodChannel('home_widget/background');
   WidgetsFlutterBinding.ensureInitialized();
 

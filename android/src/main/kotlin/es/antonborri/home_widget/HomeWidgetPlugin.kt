@@ -3,6 +3,7 @@ package es.antonborri.home_widget
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.*
+import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -26,6 +27,7 @@ class HomeWidgetPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     private var receiver: BroadcastReceiver? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        Log.e("cbn", "onAttachedToEngine")
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "home_widget")
         channel.setMethodCallHandler(this)
 
@@ -35,6 +37,7 @@ class HomeWidgetPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
+        Log.e("cbn", "onMethodCall, ${call.method}")
         when (call.method) {
             "saveWidgetData" -> {
                 if (call.hasArgument("id") && call.hasArgument("data")) {

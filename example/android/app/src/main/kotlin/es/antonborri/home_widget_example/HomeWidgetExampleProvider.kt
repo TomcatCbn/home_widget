@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetBackgroundIntent
@@ -15,6 +16,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: SharedPreferences) {
         appWidgetIds.forEach { widgetId ->
+            Log.e("cbn", "onUpdate...")
             val views = RemoteViews(context.packageName, R.layout.example_layout).apply {
                 // Open App on Widget Click
                 val pendingIntent = HomeWidgetLaunchIntent.getActivity(
@@ -23,7 +25,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                 setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
                 // Swap Title Text by calling Dart Code in the Background
-                setTextViewText(R.id.widget_title, widgetData.getString("title", null)
+                setTextViewText(R.id.widget_title, widgetData.getString("title", "default")
                         ?: "No Title Set")
                 val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
                         context,
